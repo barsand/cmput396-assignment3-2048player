@@ -23,6 +23,14 @@ class board_2048(object):
 
 		self.board = m
 
+	def reflect_board(self):
+		m = [self.b_siz * [0] for i in range(self.b_siz)]
+		for i in range(self.b_siz):
+			for j in range(self.b_siz):
+				m[i][j] = self.board[i][self.b_siz -1 - j]
+
+		self.board = m
+
 	def shift_l(self, row): return [i for i in row if i != 0]
 
 
@@ -42,6 +50,7 @@ class board_2048(object):
 			for j in range(1, len(m[i])):
 				if (m[i][j] != 0) and (m[i][j] == m[i][last]):
 					m[i][last] *= 2
+					score += m[i][last]
 					m[i][j] = 0
 				last = j
 
@@ -54,6 +63,8 @@ class board_2048(object):
 		self.board = m
 		print "after move:"
 		self.print_board()
+
+		return score
 
 
 
@@ -109,9 +120,8 @@ class board_2048(object):
 	def play(self):
 		while self.place_2_in_a_random_cell():
 			self.move[self.get_next_move()]()
-			print "after move:"
-			# self.print_board() *printerase#0*
 			print "======================================================"
+
 
 
 
@@ -119,15 +129,15 @@ def main ():
 	print "input the dimension of the board:	",
 	b_siz = int(raw_input())	# board size
 
-
-
 	game = board_2048(b_siz)
 	game.play()
 
 	print "game over!"
 
-	# game.print_board()
-	
+	game.print_board()
+	game.reflect_board()
+	game.print_board()
+
 
 
 
