@@ -33,7 +33,6 @@ class board_2048(object):
 
 	def shift_l(self, row): return [i for i in row if i != 0]
 
-
 	def move_l(self):
 		print "before move:"
 		self.print_board()
@@ -67,19 +66,27 @@ class board_2048(object):
 		return score
 
 
+	def move_r(self):
+		self.reflect_board()
+		score = self.move_l()
+		self.reflect_board()
+		return score
 
 
-			
+	def move_u(self):
+		self.transpose_board()
+		score = self.move_l()
+		self.transpose_board()
+		return score
 
 
-	def move_r(row):
-		pass
-
-	def move_u(row):
-		pass
-
-	def move_d(row):
-		pass
+	def move_d(self):
+		self.transpose_board()
+		self.reflect_board()
+		score = self.move_l()
+		self.reflect_board()
+		self.transpose_board()
+		return score
 		
 	def print_board(self):
 		for row in self.board: print row
@@ -93,11 +100,34 @@ class board_2048(object):
 		return False
 
 	def get_next_move(self):
-		# return random.choice(self.possible_moves)
-		return 'l'
+
+		max_score = 0
+		max_move = None
+
+		move_evaluation = {}
+		board_backup = copy.deepcopy(self.board)
+
+		for move in self.possible_moves:
+			print "* evaluatiing score of moving: ", move
+			self.board = copy.deepcopy(board_backup)
+			move_evaluation[move] = self.move[move]()
+			if move_evaluation[move] > max_score:
+				max_score = move_evaluation[move]
+				max_move = move
+			print "\t\tmoving ", move, "generates score of ", max_score, "."
+
+		
+		self.board = copy.deepcopy(board_backup)
+
+		if max_move: 	return max_move
+		else: 			return random.choice(self.possible_moves)
+
+
+		
+
 
 	def place_2_in_a_random_cell(self):
-		print "placing a random 2 in: "
+		# print "placing a random 2 in: " *printerase#1*
 		# self.print_board() *printerase#0*
 		empty_cells = []
 		for i in range(self.b_siz):
@@ -112,15 +142,23 @@ class board_2048(object):
 		i = random_cell[0]
 		j = random_cell[1]
 		self.board[i][j] = 2
-		print "placed:"
+		# print "placed:" *printerase#1*
 		# self.print_board() *printerase#0*
 		return True
 
 
 	def play(self):
+		score = 0
 		while self.place_2_in_a_random_cell():
-			self.move[self.get_next_move()]()
+			print "board state:"
+			self.print_board()
+			print "\n"
+			next_move = self.get_next_move()
+			print ">>>>> moving ", next_move, "!"
+			score += self.move[next_move]()
 			print "======================================================"
+
+		return score
 
 
 
@@ -130,12 +168,13 @@ def main ():
 	b_siz = int(raw_input())	# board size
 
 	game = board_2048(b_siz)
-	game.play()
+	score = game.play()
 
-	print "game over!"
+	print "======================================================"
+	print "======================================================"
+	print "======================================================"
+	print "game over! score: ", score
 
-	game.print_board()
-	game.reflect_board()
 	game.print_board()
 
 
